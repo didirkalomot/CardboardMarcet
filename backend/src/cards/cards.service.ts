@@ -12,16 +12,16 @@ export class CardsService {
     private cardsRepository: Repository<Card>,
   ) {}
 
-  async create(createCardDto: CreateCardDto, seller: User, files: Express.Multer.File[]): Promise<Card> {
-    const imagePaths = files.map(file => `/uploads/${file.filename}`);
-    const card = this.cardsRepository.create({
-      ...createCardDto,
-      seller,
-      images: imagePaths,
-      status: CardStatus.MODERATION,
-    });
-    return this.cardsRepository.save(card);
-  }
+  async create(createCardDto: CreateCardDto, seller: any, files: Express.Multer.File[]): Promise<Card> {
+   const imagePaths = files.map(file => `/uploads/${file.filename}`);
+   const card = this.cardsRepository.create({
+     ...createCardDto,
+     seller: { id: seller.userId } as User,   // связываем по id
+     images: imagePaths,
+     status: CardStatus.MODERATION,
+   });
+   return this.cardsRepository.save(card);
+ }
 
   async findAllActive(): Promise<Card[]> {
     return this.cardsRepository.find({
