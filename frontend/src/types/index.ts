@@ -1,16 +1,34 @@
+// User types
+export interface User {
+  id: string;
+  email: string;
+  role: 'collector' | 'verified_seller' | 'moderator' | 'admin';
+  isVerified: boolean;
+  rating: number;
+  avatarUrl?: string;
+}
+
+// Card types
+export type CardCondition = 'Mint' | 'Excellent' | 'Good';
+export type CardStatus = 'draft' | 'moderation' | 'active' | 'sold' | 'rejected';
+
 export interface Card {
   id: string;
   title: string;
-  description: string;
-  year: number;
+  description?: string;
+  year?: number;
   publisher?: string;
-  condition: 'Mint' | 'Excellent' | 'Good';
+  condition: CardCondition;
   images: string[];
+  status: CardStatus;
   price?: number;
-  status: 'draft' | 'moderation' | 'active' | 'sold';
   sellerId: string;
-  createdAt: string;
+  seller?: User;
+  auction?: Auction;
 }
+
+// Auction types
+export type AuctionStatus = 'active' | 'closed' | 'cancelled';
 
 export interface Auction {
   id: string;
@@ -21,8 +39,9 @@ export interface Auction {
   minBidStep: number;
   startTime: string;
   endTime: string;
-  status: 'active' | 'closed' | 'cancelled';
+  status: AuctionStatus;
   buyNowPrice?: number;
+  bids?: Bid[];
 }
 
 export interface Bid {
@@ -32,18 +51,12 @@ export interface Bid {
   amount: number;
   createdAt: string;
   user?: {
+    id: string;
     email: string;
   };
 }
 
-export interface User {
-  id: string;
-  email: string;
-  role: 'guest' | 'seller' | 'admin';
-  rating: number;
-  isVerified: boolean;
-}
-
+// DTO types
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -52,5 +65,39 @@ export interface LoginCredentials {
 export interface RegisterData {
   email: string;
   password: string;
-  username: string;
+}
+
+export interface CreateCardData {
+  title: string;
+  description?: string;
+  year?: number;
+  publisher?: string;
+  condition?: CardCondition;
+  price?: number;
+}
+
+export interface CreateAuctionData {
+  startPrice: number;
+  minBidStep: number;
+  endTime: string;
+  buyNowPrice?: number;
+}
+
+export interface PlaceBidData {
+  amount: number;
+}
+
+// API Response types
+export interface AuthResponse {
+  access_token: string;
+  user: User;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  role: 'collector' | 'verified_seller' | 'moderator' | 'admin';
+  isVerified: boolean;
+  rating: number;
+  avatarUrl?: string;
 }

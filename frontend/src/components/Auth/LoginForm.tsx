@@ -10,12 +10,6 @@ interface LoginFormData {
   password: string;
 }
 
-interface LoginError {
-  data?: {
-    message?: string;
-  };
-}
-
 export const LoginForm = () => {
   const { register, handleSubmit } = useForm<LoginFormData>();
   const [login, { isLoading }] = useLoginMutation();
@@ -25,10 +19,10 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const result = await login(data).unwrap();
+      // Бэкенд возвращает { access_token, user }
       dispatch(setCredentials({ user: result.user, token: result.access_token }));
-    } catch (err) {
-      const error = err as LoginError;
-      setError(error.data?.message || 'Login failed');
+    } catch (err: any) {
+      setError(err.data?.message || 'Login failed');
     }
   };
 
