@@ -16,7 +16,7 @@ import {
   Button,
   Chip,
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -40,7 +40,6 @@ const StatusChip = styled(Chip)({
 export const CatalogPage = () => {
   const [search, setSearch] = useState('');
   const [condition, setCondition] = useState('');
-  const [status, setStatus] = useState('');
 
   const { data: cards, isLoading, error } = useGetCardsQuery();
 
@@ -68,7 +67,7 @@ export const CatalogPage = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <CircularProgress />
       </Box>
     );
@@ -76,7 +75,7 @@ export const CatalogPage = () => {
 
   if (error) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <Typography color="error">Ошибка загрузки карточек. Убедитесь, что бэкенд запущен.</Typography>
       </Box>
     );
@@ -85,13 +84,12 @@ export const CatalogPage = () => {
   const filteredCards = cards?.filter((card) => {
     const matchSearch = card.title.toLowerCase().includes(search.toLowerCase());
     const matchCondition = condition ? card.condition === condition : true;
-    const matchStatus = status ? card.status === status : true;
-    return matchSearch && matchCondition && matchStatus;
+    return matchSearch && matchCondition;
   });
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, py: 4 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
         Коллекционные карточки
       </Typography>
 
@@ -114,23 +112,15 @@ export const CatalogPage = () => {
           </Select>
         </FormControl>
 
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Тип продажи</InputLabel>
-          <Select value={status} onChange={(e) => setStatus(e.target.value)} label="Тип продажи">
-            <MenuItem value="">Все</MenuItem>
-            <MenuItem value="active">В продаже</MenuItem>
-          </Select>
-        </FormControl>
-
-        {(search || condition || status) && (
-          <Button onClick={() => { setSearch(''); setCondition(''); setStatus(''); }}>
+        {(search || condition) && (
+          <Button onClick={() => { setSearch(''); setCondition(''); }}>
             Сбросить
           </Button>
         )}
       </Box>
 
       {filteredCards?.length === 0 ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="40vh">
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
           <Typography variant="h6" color="text.secondary">
             Карточки не найдены
           </Typography>

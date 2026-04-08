@@ -27,10 +27,12 @@ import { RedisModule } from './redis/redis.module';
         synchronize: true, // для разработки
       }),
     }),
- //   ThrottlerModule.forRoot({
- //     ttl: 3000,
- //     limit: 1,
- //   }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 3000,
+        limit: 1,
+      },
+    ]),
     ScheduleModule.forRoot(),
     RedisModule,
     AuthModule,
