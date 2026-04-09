@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '../store/api';
+import { RootState } from '../store/store';
 import {
   Card,
   CardMedia,
@@ -38,6 +41,8 @@ const StatusChip = styled(Chip)({
 });
 
 export const CatalogPage = () => {
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
   const [search, setSearch] = useState('');
   const [condition, setCondition] = useState('');
 
@@ -89,6 +94,34 @@ export const CatalogPage = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mb: 2 }}>
+        {!user && (
+          <Button variant="contained" color="primary" onClick={() => navigate('/login', { replace: true })}>
+            + Продать карточку
+          </Button>
+        )}
+        {user && (user?.role === 'collector' || user?.role === 'verified_seller') && (
+          <Button variant="contained" color="primary" onClick={() => navigate('/create-card')}>
+            + Продать карточку
+          </Button>
+        )}
+        {user && (
+          <Button variant="outlined" onClick={() => navigate('/profile')}>
+            Личный кабинет
+          </Button>
+        )}
+        {user?.role === 'moderator' && (
+          <Button variant="outlined" color="warning" onClick={() => navigate('/moderation')}>
+            Модерация
+          </Button>
+        )}
+        {user?.role === 'admin' && (
+          <Button variant="outlined" color="error" onClick={() => navigate('/admin')}>
+            Админ-панель
+          </Button>
+        )}
+      </Box>
+
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
         Коллекционные карточки
       </Typography>
@@ -99,12 +132,23 @@ export const CatalogPage = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           size="small"
-          sx={{ minWidth: 200 }}
+          sx={{ 
+                backgroundColor: 'white',  // стиль для корня TextField
+                '& .MuiOutlinedInput-root': {  // "&" = ссылка на текущий компонент
+                  '& fieldset': {              // вложенный селектор для fieldset
+                    borderColor: '#e0e0e0',    // цвет границы
+                  },
+                },
+              }}
         />
 
-        <FormControl size="small" sx={{ minWidth: 150 }}>
+        <FormControl size="small" sx={{ minWidth: 150, backgroundColor: 'white' }}>
           <InputLabel>Состояние</InputLabel>
-          <Select value={condition} onChange={(e) => setCondition(e.target.value)} label="Состояние">
+          <Select 
+            value={condition} 
+            onChange={(e) => setCondition(e.target.value)} 
+            label="Состояние"
+          >
             <MenuItem value="">Все</MenuItem>
             <MenuItem value="Mint">Mint</MenuItem>
             <MenuItem value="Excellent">Excellent</MenuItem>

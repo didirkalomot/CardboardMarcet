@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useCreateCardMutation } from '../../store/api';
 import {
   TextField,
@@ -13,6 +13,9 @@ import {
   Input,
 } from '@mui/material';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
+import { RootState } from '../../store/store';
 
 interface CardFormData {
   title: string;
@@ -26,66 +29,70 @@ interface CardFormData {
 }
 
 export const CardForm = () => {
-  const { register, handleSubmit, watch } = useForm<CardFormData>({
+  const token = useSelector((state: RootState) => state.auth.token);
+  const { register, handleSubmit, control } = useForm<CardFormData>({
     defaultValues: { isAuction: false }
   });
+  
   const [createCard, { isLoading }] = useCreateCardMutation();
   const [images, setImages] = useState<File[]>([]);
-  const isAuction = watch('isAuction');
+  const isAuction = useWatch({ name: 'isAuction', control });
 
-  const onSubmit = async (data: CardFormData) => {
-    const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('description', data.description);
-    formData.append('year', data.year.toString());
-    formData.append('condition', data.condition);
-    formData.append('isAuction', data.isAuction.toString());
-    
-    if (!data.isAuction && data.price) {
-      formData.append('price', data.price.toString());
-    }
-    
-    if (data.isAuction) {
-      if (data.startPrice) formData.append('startPrice', data.startPrice.toString());
-      if (data.auctionEndDate) formData.append('endTime', data.auctionEndDate);
-    }
-    
-    images.forEach((img) => formData.append('images', img));
-    
-    await createCard(formData);
-    alert('Card created!');
-  };
+  // ПРОВЕРКА ПОСЛЕ ВСЕХ ХУКОВ
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+    const onSubmit = async (data: CardFormData) => {
+      const cardData = {
+        title: data.title,
+        description: data.description,
+        year: data.year,
+        condition: data.condition as 'Mint' | 'Excellent' | 'Good',
+        price: data.isAuction ? undefined : data.price,
+        startPrice: data.isAuction ? data.startPrice : undefined,
+        endTime: data.isAuction ? data.auctionEndDate : undefined,
+      };
+
+      await createCard({
+        data: cardData,
+        images: images,
+      });
+      alert('Карточка создана!');
+    };
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" mb={2}>Create Card</Typography>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          Создание карточки
+        </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <TextField {...register('title', { required: true })} label="Card Title" fullWidth margin="normal" />
-          <TextField {...register('description')} label="Description" multiline rows={3} fullWidth margin="normal" />
-          <TextField {...register('year', { required: true })} type="number" label="Year" fullWidth margin="normal" />
-          
+          <TextField {...register('title', { required: true })} label="Название" fullWidth margin="normal" />
+          <TextField {...register('description')} label="Описание" multiline rows={3} fullWidth margin="normal" />
+          <TextField {...register('year', { required: true })} type="number" label="Год выпуска" fullWidth margin="normal" />
+
           <Select {...register('condition', { required: true })} fullWidth sx={{ mt: 2 }}>
-            <MenuItem value="Mint">Mint</MenuItem>
-            <MenuItem value="Excellent">Excellent</MenuItem>
-            <MenuItem value="Good">Good</MenuItem>
+            <MenuItem value="Mint">Mint (Идеальное)</MenuItem>
+            <MenuItem value="Excellent">Excellent (Отличное)</MenuItem>
+            <MenuItem value="Good">Good (Хорошее)</MenuItem>
           </Select>
-          
+
           <FormControlLabel
             control={<Switch {...register('isAuction')} />}
-            label="Auction"
+            label="Аукцион"
             sx={{ mt: 2 }}
           />
-          
+
           {!isAuction ? (
-            <TextField {...register('price')} type="number" label="Price" fullWidth margin="normal" />
+            <TextField {...register('price')} type="number" label="Цена" fullWidth margin="normal" />
           ) : (
             <>
-              <TextField {...register('startPrice')} type="number" label="Start Price" fullWidth margin="normal" />
+              <TextField {...register('startPrice')} type="number" label="Стартовая цена" fullWidth margin="normal" />
               <TextField {...register('auctionEndDate')} type="datetime-local" fullWidth margin="normal" />
             </>
           )}
-          
+
           <Input
             type="file"
             inputProps={{ multiple: true, accept: 'image/*' }}
@@ -95,9 +102,9 @@ export const CardForm = () => {
             }}
             sx={{ mt: 2 }}
           />
-          
+
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }} disabled={isLoading}>
-            {isLoading ? 'Creating...' : 'Create Card'}
+            {isLoading ? 'Создание...' : 'Создать карточку'}
           </Button>
         </form>
       </Paper>

@@ -9,6 +9,7 @@ import { CardsModule } from './cards/cards.module';
 import { AuctionsModule } from './auctions/auctions.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { RedisModule } from './redis/redis.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { RedisModule } from './redis/redis.module';
     CardsModule,
     AuctionsModule,
     ModerationModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

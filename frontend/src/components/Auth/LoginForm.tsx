@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/authSlice';
 import { TextField, Button, Box, Paper, Typography, Alert } from '@mui/material';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface LoginFormData {
   email: string;
@@ -22,11 +22,13 @@ export const LoginForm = () => {
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       const result = await login(data).unwrap();
       dispatch(setCredentials({ user: result.user, token: result.access_token }));
+      navigate('/');  // ← ПЕРЕХОД НА ГЛАВНУЮ ПОСЛЕ ВХОДА
     } catch (err) {
       const error = err as LoginError;
       setError(error.data?.message || 'Login failed');

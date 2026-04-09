@@ -6,6 +6,10 @@ import { AuctionPage } from './pages/AuctionPage';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RegisterForm } from './components/Auth/RegisterForm';
 import { CardForm } from './components/Card/CardForm';
+import { ModerationPage } from './pages/ModerationPage';
+import { AdminPanel } from './pages/AdminPanel';
+import { ChatPage } from './pages/ChatPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 const PrivateRoute = ({ children }: { children: React.ReactElement }) => {
   const token = useSelector((state: RootState) => state.auth.token);
@@ -24,6 +28,26 @@ function App() {
           <Route path="/create-card" element={
             <PrivateRoute>
               <CardForm />
+            </PrivateRoute>
+          } />
+          <Route path="/moderation" element={
+            <PrivateRoute>
+              <ModerationPage />
+            </PrivateRoute>
+          } />
+          <Route path="/admin" element={
+            <PrivateRoute>
+              <AdminPanel />
+            </PrivateRoute>
+          } />
+          <Route path="/chat" element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          } />
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <ProfilePage />
             </PrivateRoute>
           } />
         </Routes>
