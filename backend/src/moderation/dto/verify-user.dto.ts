@@ -1,10 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class ModerateCardDto {
-  @IsOptional()
-  @IsString()
-  certificateNumber?: string;
-
+export class VerifyUserDto {
   @IsOptional()
   @IsString()
   comment?: string;

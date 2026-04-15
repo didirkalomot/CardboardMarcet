@@ -1,14 +1,13 @@
-import { Controller, Get, Patch, Body, Request, UseGuards, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { AuctionsService } from '../auctions/auctions.service';
 import { ChatsService } from '../chats/chats.service';
 import { CardsService } from '../cards/cards.service';
-import { ChangePasswordDto } from './dto/change-password.dto';
 
-@Controller() // базовый путь пустой, чтобы эндпоинты были /profile, /profile/auctions и т.д.
+@Controller() // без префикса, чтобы эндпоинты были /profile, /profile/auctions и т.д.
 @UseGuards(AuthGuard('jwt'))
-export class UsersController {
+export class ProfileController {
   constructor(
     private readonly usersService: UsersService,
     private readonly auctionsService: AuctionsService,
@@ -17,25 +16,25 @@ export class UsersController {
   ) {}
 
   @Get('profile')
-async getProfile(@Request() req) {
-  const user = await this.usersService.findOneById(req.user.userId);
-  if (!user) {
-    throw new NotFoundException('User not found');
+  @UseGuards(AuthGuard('jwt')) 
+  async getProfile(@Request() req) {
+    const user = await this.usersService.findOneById(req.user.userId);
+    if (!user) throw new Error('User not found');
+    return {
+      email: user.email,
+      ratingBuyer: user.rating,
+      ratingSeller: user.rating,
+    };
   }
-  return {
-    email: user.email,
-    ratingBuyer: user.rating,
-    ratingSeller: user.rating,
-  };
-}
 
   @Patch('profile/password')
-  async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
-    await this.usersService.changePassword(req.user.userId, dto.oldPassword, dto.newPassword);
+  async changePassword(@Request() req, @Body() body: { oldPassword: string; newPassword: string }) {
+    await this.usersService.changePassword(req.user.userId, body.oldPassword, body.newPassword);
     return { success: true };
   }
 
   @Get('profile/auctions')
+  @UseGuards(AuthGuard('jwt')) 
   async getUserAuctions(@Request() req) {
     return this.auctionsService.findUserBids(req.user.userId);
   }

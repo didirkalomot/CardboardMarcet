@@ -10,11 +10,9 @@ import { AuctionsCron } from './auctions.cron';
 import { CardsModule } from '../cards/cards.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Auction, Bid, Card]), // добавили Card
-    CardsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Auction, Bid, Card]), CardsModule],
   providers: [AuctionsService, AuctionsGateway, AuctionsCron],
   controllers: [AuctionsController],
+  exports: [AuctionsService], // должно быть!
 })
 export class AuctionsModule {}

@@ -33,4 +33,10 @@ export class VerificationRequest {
 
   @Column({ nullable: true })
   comment: string;
+
+  @ManyToOne(() => User)
+  user: User;
+
+  @Column()
+  userId: string;
 }

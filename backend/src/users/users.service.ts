@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -24,4 +25,14 @@ export class UsersService {
     const user = this.usersRepository.create({ email, passwordHash });
     return this.usersRepository.save(user);
   }
+
+async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<void> {
+  const user = await this.findOneById(userId);
+  if (!user) throw new NotFoundException('User not found');
+  const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+  if (!isMatch) throw new BadRequestException('Old password is incorrect');
+  const newHash = await bcrypt.hash(newPassword, 10);
+  user.passwordHash = newHash;
+  await this.usersRepository.save(user);
+}
 }

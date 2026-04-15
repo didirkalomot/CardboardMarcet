@@ -1,10 +1,11 @@
-import { Controller, Post, UseGuards, Request, UseInterceptors, UploadedFiles, Get, Param, Patch, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, UseInterceptors, UploadedFiles, Get, Param, Patch, Body, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { CardsService } from './cards.service';
 import { CreateCardDto } from './dto/create-card.dto';
+
 
 @Controller('cards')
 export class CardsController {
@@ -44,4 +45,9 @@ export class CardsController {
   async findOne(@Param('id') id: string) {
     return this.cardsService.findOne(id);
   }
+
+  @Get('search')
+  async search(@Query('title') title: string) {
+   return this.cardsService.searchByTitle(title);
+ }
 }

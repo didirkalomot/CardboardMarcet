@@ -10,6 +10,7 @@ import { AuctionsModule } from './auctions/auctions.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { RedisModule } from './redis/redis.module';
 import { AdminModule } from './admin/admin.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AdminModule } from './admin/admin.module';
     AuctionsModule,
     ModerationModule,
     AdminModule,
+    ChatsModule,
   ],
 })
 export class AppModule {}

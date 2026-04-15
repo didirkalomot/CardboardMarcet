@@ -12,14 +12,14 @@ import { AuctionsGateway } from './auctions.gateway';
 @Injectable()
 export class AuctionsService {
   constructor(
-    @InjectRepository(Auction)
-    private auctionsRepository: Repository<Auction>,
-    @InjectRepository(Bid)
-    private bidsRepository: Repository<Bid>,
-    @InjectRepository(Card)
-    private cardsRepository: Repository<Card>,
-    private auctionsGateway: AuctionsGateway,
-  ) {}
+  @InjectRepository(Auction)
+  private auctionsRepository: Repository<Auction>,
+  @InjectRepository(Bid)
+  private bidsRepository: Repository<Bid>,
+  @InjectRepository(Card) // !!! здесь CardRepository
+  private cardsRepository: Repository<Card>,
+  private auctionsGateway: AuctionsGateway,
+) {}
 
   async create(cardId: string, createAuctionDto: CreateAuctionDto, sellerId: string): Promise<Auction> {
     const card = await this.cardsRepository.findOne({ where: { id: cardId, sellerId } });
@@ -118,4 +118,19 @@ export class AuctionsService {
       await this.closeAuction(auction.id);
     }
   }
+  async findUserBids(userId: string): Promise<any[]> {
+  const bids = await this.bidsRepository.find({
+    where: { userId },
+    relations: ['auction', 'auction.card'],
+    order: { createdAt: 'DESC' },
+  });
+  return bids.map(bid => ({
+    id: bid.auction.id,
+    cardTitle: bid.auction.card.title,
+    currentPrice: bid.auction.currentPrice,
+    status: bid.auction.status,
+    endTime: bid.auction.endTime,
+    myBid: bid.amount,
+  }));
+}
 }

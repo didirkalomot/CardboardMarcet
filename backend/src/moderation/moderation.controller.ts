@@ -10,26 +10,33 @@ import { Roles } from '../auth/roles.decorator';
 export class ModerationController {
   constructor(private moderationService: ModerationService) {}
 
-  @Get('pending')
+   @Get('pending-cards')
   async getPendingCards() {
     return this.moderationService.getPendingCards();
   }
 
+  
   @Post('cards/:cardId/approve')
-  async approveCard(
-    @Param('cardId') cardId: string,
-    @Body() body: { certificateNumber?: string; comment?: string },
-    @Request() req,
-  ) {
-    return this.moderationService.approveCard(cardId, req.user.userId, body.certificateNumber, body.comment);
-  }
+async approveCard(@Param('cardId') cardId: string, @Body() body: any, @Request() req) {
+  const moderatorId = req.user.userId; // или req.user.id – зависит от вашей стратегии
+  return this.moderationService.approveCard(cardId, moderatorId, body.certificateNumber, body.comment);
+}
 
   @Post('cards/:cardId/reject')
-  async rejectCard(
-    @Param('cardId') cardId: string,
-    @Body() body: { comment?: string },
-    @Request() req,
-  ) {
+  async rejectCard(@Param('cardId') cardId: string, @Body() body, @Request() req) {
     return this.moderationService.rejectCard(cardId, req.user.userId, body.comment);
+  }
+
+  
+  @Get('pending-verifications')
+  async getPendingVerifications() {
+    return this.moderationService.getPendingVerifications();
+  }
+
+  
+  @Post('verify-user/:userId')
+  async verifyUser(@Param('userId') userId: string) {
+    await this.moderationService.verifyUser(userId);
+    return { success: true };
   }
 }

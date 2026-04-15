@@ -39,9 +39,22 @@ export class CardsService {
     return card;
   }
 
-  async updateStatus(id: string, status: CardStatus): Promise<Card> {
-    const card = await this.findOne(id);
+  async updateStatus(cardId: string, status: CardStatus): Promise<Card> {
+    const card = await this.findOne(cardId);
+    if (!card) throw new Error('Card not found');
     card.status = status;
     return this.cardsRepository.save(card);
   }
+	
+  async findBySellerId(sellerId: string): Promise<Card[]> {
+   return this.cardsRepository.find({ where: { sellerId }, select: ['id', 'title', 'price', 'status'] });
+ }
+  async searchByTitle(title: string): Promise<Card[]> {
+   return this.cardsRepository
+     .createQueryBuilder('card')
+     .where('card.title ILIKE :title', { title: `%${title}%` })
+     .andWhere('card.status = :status', { status: 'active' })
+     .leftJoinAndSelect('card.seller', 'seller')
+     .getMany();
+ }
 }

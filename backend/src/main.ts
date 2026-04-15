@@ -9,9 +9,9 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: true,
     credentials: true,
   });
   app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' });
