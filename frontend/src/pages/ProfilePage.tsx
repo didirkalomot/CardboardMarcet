@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import { RootState } from '../store/store';
+import { logout } from '../store/authSlice';
 import {
   Box,
   Typography,
@@ -52,6 +53,9 @@ interface ProfileData {
 }
 
 export const ProfilePage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
   const [tabValue, setTabValue] = useState(0);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [auctions, setAuctions] = useState<Auction[]>([]);
@@ -198,7 +202,20 @@ export const ProfilePage = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          <Typography variant="h6" gutterBottom>Смена пароля</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6">Смена пароля</Typography>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                dispatch(logout());
+                navigate('/');
+              }}
+            >
+              Выйти
+            </Button>
+          </Box>
+
           <Grid container spacing={2} sx={{ maxWidth: 400 }}>
             <Grid size={12}>
               <TextField
