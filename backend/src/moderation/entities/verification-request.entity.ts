@@ -16,7 +16,7 @@ export class VerificationRequest {
   @ManyToOne(() => Card)
   card: Card;
 
-  @Column()
+  @Column({nullable: true})
   cardId: string;
 
   @ManyToOne(() => User)
@@ -37,6 +37,6 @@ export class VerificationRequest {
   @ManyToOne(() => User)
   user: User;
 
-  @Column()
+  @Column({nullable: true})
   userId: string;
 }

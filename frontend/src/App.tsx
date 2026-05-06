@@ -25,6 +25,7 @@ function App() {
           <Route path="/auction/:id" element={<AuctionPage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
+          <Route path="/chats/:id" element={<ChatPage />} />
           <Route path="/create-card" element={
             <PrivateRoute>
               <CardForm />

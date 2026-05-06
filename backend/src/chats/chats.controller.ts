@@ -16,7 +16,7 @@ export class ChatsController {
 
   @Post()
   async createChat(@Request() req, @Body() dto: CreateChatDto) {
-    return this.chatsService.createChat(dto.sellerId, req.user.userId, dto.cardId);
+    return this.chatsService.createChat(dto.sellerId, req.user.id, dto.cardId);
   }
 
   @Get(':chatId/messages')

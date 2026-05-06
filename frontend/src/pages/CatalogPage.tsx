@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '../store/api';
 import { RootState } from '../store/store';
+import axios from 'axios'; // 1. Добавили импорт axios
 import {
   Card,
   CardMedia,
@@ -43,10 +44,39 @@ const StatusChip = styled(Chip)({
 export const CatalogPage = () => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.token); // 2. Получаем токен
   const [search, setSearch] = useState('');
   const [condition, setCondition] = useState('');
 
   const { data: cards, isLoading, error } = useGetCardsQuery();
+
+  // 3. Функция создания чата при покупке
+  const handleBuyClick = async (cardId: number, sellerId: number) => {
+    if (!user) {
+      alert('Сначала войдите в систему');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      // Создаём чат через API
+      const response = await axios.post(
+        'http://localhost:3000/chats',
+        { cardId, sellerId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Перенаправляем в созданный чат
+      navigate(`/chats/${response.data.id}`);
+    } catch (err: any) {
+      console.error('Ошибка создания чата:', err);
+      alert(err.response?.data?.message || 'Ошибка при создании чата');
+    }
+  };
 
   const getStatusColor = (cardStatus: string) => {
     switch (cardStatus) {
@@ -132,11 +162,11 @@ export const CatalogPage = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           size="small"
-          sx={{ 
-                backgroundColor: 'white',  // стиль для корня TextField
-                '& .MuiOutlinedInput-root': {  // "&" = ссылка на текущий компонент
-                  '& fieldset': {              // вложенный селектор для fieldset
-                    borderColor: '#e0e0e0',    // цвет границы
+          sx={{
+                backgroundColor: 'white',
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#e0e0e0',
                   },
                 },
               }}
@@ -144,9 +174,9 @@ export const CatalogPage = () => {
 
         <FormControl size="small" sx={{ minWidth: 150, backgroundColor: 'white' }}>
           <InputLabel>Состояние</InputLabel>
-          <Select 
-            value={condition} 
-            onChange={(e) => setCondition(e.target.value)} 
+          <Select
+            value={condition}
+            onChange={(e) => setCondition(e.target.value)}
             label="Состояние"
           >
             <MenuItem value="">Все</MenuItem>
@@ -204,7 +234,13 @@ export const CatalogPage = () => {
                   </Typography>
                 </CardContent>
                 <CardActions sx={{ p: 2, pt: 0 }}>
-                  <Button variant="contained" fullWidth disabled={card.status === 'sold'}>
+                  {/* 4. Добавили обработчик onClick */}
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    disabled={card.status === 'sold'}
+                    onClick={() => handleBuyClick(card.id, card.sellerId)}
+                  >
                     {card.status === 'active' ? 'Купить' : 'Подробнее'}
                   </Button>
                 </CardActions>
