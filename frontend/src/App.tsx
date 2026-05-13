@@ -4,7 +4,7 @@ import { store } from './store/store';
 import type { RootState } from './store/store';
 import { CatalogPage } from './pages/CatalogPage';
 import { AuctionPage } from './pages/AuctionPage';
-import { LoginForm } from './components/Auth/LoginForm';
+import { AuthForm } from './components/Auth/AuthForm';
 import { CardForm } from './components/Card/CardForm';
 
 const PrivateRoute = ({ children }: { children: React.ReactElement }) => {
@@ -19,12 +19,8 @@ function App() {
         <Routes>
           <Route path="/" element={<CatalogPage />} />
           <Route path="/auction/:id" element={<AuctionPage />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/create-card" element={
-            <PrivateRoute>
-              <CardForm />
-            </PrivateRoute>
-          } />
+          <Route path="/login" element={<AuthForm />} />
+          <Route path="/create-card" element={<PrivateRoute><CardForm /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </Provider>
