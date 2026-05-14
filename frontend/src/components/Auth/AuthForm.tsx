@@ -2,14 +2,18 @@ import { useForm } from 'react-hook-form';
 import { useLoginMutation, useRegisterMutation } from '../../store/api';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/authSlice';
-import { TextField, Button, Box, Paper, Typography, Alert, Tabs, Tab } from '@mui/material';
+import { TextField, Button, Box, Paper, Alert, Tabs, Tab } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface FormData { email: string; password: string; }
 
-export const AuthForm = () => {
-  const [isLogin, setIsLogin] = useState(true);
+interface AuthFormProps {
+  mode: 'login' | 'register';
+}
+
+export const AuthForm = ({ mode }: AuthFormProps) => {
+  const [isLogin, setIsLogin] = useState(mode === 'login');
   const { register, handleSubmit } = useForm<FormData>();
   const [login, { isLoading: loadingLogin }] = useLoginMutation();
   const [registerMut, { isLoading: loadingRegister }] = useRegisterMutation();
