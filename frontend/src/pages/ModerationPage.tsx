@@ -8,7 +8,7 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Grid,
+  Grid2 as Grid,
   Paper,
   Tabs,
   Tab,

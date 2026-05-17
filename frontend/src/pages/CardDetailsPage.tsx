@@ -15,8 +15,8 @@ import {
   Alert,
   Avatar,
   Divider,
+  Grid2 as Grid,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import axios from 'axios';
 
 interface CardListing {
@@ -127,7 +127,7 @@ export const CardDetailsPage = () => {
           const isLoggedIn = !!token;
           
           return (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 {listing.images?.[0] && (
                   <CardMedia

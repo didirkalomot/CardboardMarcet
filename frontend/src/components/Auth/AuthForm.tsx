@@ -12,6 +12,12 @@ interface AuthFormProps {
   mode: 'login' | 'register';
 }
 
+interface LoginError {
+  data?: {
+    message?: string;
+  };
+}
+
 export const AuthForm = ({ mode }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(mode === 'login');
   const { register, handleSubmit } = useForm<FormData>();
@@ -26,8 +32,9 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
       const result = await (isLogin ? login : registerMut)(data).unwrap();
       dispatch(setCredentials({ user: result.user, token: result.access_token }));
       navigate('/');
-    } catch (err: any) {
-      setError(err.data?.message || 'Ошибка');
+    } catch (err) {
+      const error = err as LoginError;
+      setError(error.data?.message || 'Login failed');
     }
   };
 

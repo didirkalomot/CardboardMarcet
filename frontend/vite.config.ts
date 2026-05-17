@@ -1,11 +1,9 @@
 import { defineConfig } from 'vite'
-import react, { reactCompilerPreset } from '@vitejs/plugin-react'
-import babel from '@rolldown/plugin-babel'
+import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    babel({ presets: [reactCompilerPreset()] })
-  ],
+  plugins: [react()],
+  // Никаких лишних прокси. Frontend стучится напрямую на http://localhost:3000,
+  // как это настроено в вашем api.ts. Это современный стандарт.
 })

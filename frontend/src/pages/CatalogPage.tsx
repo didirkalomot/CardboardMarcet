@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '../store/api';
 import type { RootState } from '../store/store';
-import axios from 'axios'; // 1. Добавили импорт axios
+import axios from 'axios';
 import {
   Card,
   CardMedia,
@@ -19,9 +19,11 @@ import {
   CircularProgress,
   Button,
   Chip,
+  Grid2 as Grid
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
+// Импортируем хелперы вместо написания своих функций
+import { getStatusColor, getStatusText } from '../utils/uiHelpers';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -44,14 +46,13 @@ const StatusChip = styled(Chip)({
 export const CatalogPage = () => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
-  const token = useSelector((state: RootState) => state.auth.token); // 2. Получаем токен
+  const token = useSelector((state: RootState) => state.auth.token);
   const [search, setSearch] = useState('');
   const [condition, setCondition] = useState('');
 
   const { data: cards, isLoading, error } = useGetCardsQuery();
 
-  // 3. Функция создания чата при покупке
-  const handleBuyClick = async (cardId: number, sellerId: number) => {
+  const handleBuyClick = async (cardId: string, sellerId: string) => {
     if (!user) {
       alert('Сначала войдите в систему');
       navigate('/login');
@@ -59,7 +60,6 @@ export const CatalogPage = () => {
     }
 
     try {
-      // Создаём чат через API
       const response = await axios.post(
         'http://localhost:3000/chats',
         { cardId, sellerId },
@@ -69,34 +69,11 @@ export const CatalogPage = () => {
           },
         }
       );
-
-      // Перенаправляем в созданный чат
       navigate(`/chats/${response.data.id}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Ошибка создания чата:', err);
-      alert(err.response?.data?.message || 'Ошибка при создании чата');
-    }
-  };
-
-  const getStatusColor = (cardStatus: string) => {
-    switch (cardStatus) {
-      case 'active':
-        return 'success';
-      case 'sold':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusText = (cardStatus: string) => {
-    switch (cardStatus) {
-      case 'active':
-        return 'В продаже';
-      case 'sold':
-        return 'Продано';
-      default:
-        return cardStatus;
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      alert(axiosError.response?.data?.message || 'Ошибка при создании чата');
     }
   };
 
@@ -124,33 +101,7 @@ export const CatalogPage = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mb: 2 }}>
-        {!user && (
-          <Button variant="contained" color="primary" onClick={() => navigate('/login', { replace: true })}>
-            + Продать карточку
-          </Button>
-        )}
-        {user && (user?.role === 'collector' || user?.role === 'verified_seller') && (
-          <Button variant="contained" color="primary" onClick={() => navigate('/create-card')}>
-            + Продать карточку
-          </Button>
-        )}
-        {user && (
-          <Button variant="outlined" onClick={() => navigate('/profile')}>
-            Личный кабинет
-          </Button>
-        )}
-        {user?.role === 'moderator' && (
-          <Button variant="outlined" color="warning" onClick={() => navigate('/moderation')}>
-            Модерация
-          </Button>
-        )}
-        {user?.role === 'admin' && (
-          <Button variant="outlined" color="error" onClick={() => navigate('/admin')}>
-            Админ-панель
-          </Button>
-        )}
-      </Box>
+      {/* Блок кнопок удалён, так как теперь он в Header */}
 
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
         Коллекционные карточки
@@ -163,13 +114,11 @@ export const CatalogPage = () => {
           onChange={(e) => setSearch(e.target.value)}
           size="small"
           sx={{
-                backgroundColor: 'white',
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: '#e0e0e0',
-                  },
-                },
-              }}
+            backgroundColor: 'white',
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': { borderColor: '#e0e0e0' },
+            },
+          }}
         />
 
         <FormControl size="small" sx={{ minWidth: 150, backgroundColor: 'white' }}>
@@ -234,12 +183,11 @@ export const CatalogPage = () => {
                   </Typography>
                 </CardContent>
                 <CardActions sx={{ p: 2, pt: 0 }}>
-                  {/* 4. Добавили обработчик onClick */}
                   <Button
                     variant="contained"
                     fullWidth
                     disabled={card.status === 'sold'}
-                    onClick={() => handleBuyClick(card.id as unknown as number, card.sellerId as unknown as number)}
+                    onClick={() => handleBuyClick(String(card.id), String(card.sellerId))}
                   >
                     {card.status === 'active' ? 'Купить' : 'Подробнее'}
                   </Button>

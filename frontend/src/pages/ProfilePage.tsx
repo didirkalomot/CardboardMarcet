@@ -18,7 +18,7 @@ import {
   ListItemText,
   Chip,
   Divider,
-  Grid,
+  Grid2 as Grid,
 } from '@mui/material';
 import axios from 'axios';
 
